@@ -3,13 +3,12 @@
 
 using namespace GC;
 
-Object::Object(GarbageCollector* gc)
+Object::Object()
 {
-	this->gc = gc;
-	this->gc->Register(this);
+	GarbageCollector::Get()->Register(this);
 }
 
 /*virtual*/ Object::~Object()
 {
-	this->gc->Unregister(this);
+	GarbageCollector::Get()->Unregister(this);
 }

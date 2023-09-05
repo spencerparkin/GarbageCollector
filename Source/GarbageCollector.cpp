@@ -3,7 +3,22 @@
 #include "Reference.h"
 #include <assert.h>
 
+namespace GC
+{
+	GarbageCollector* theGC = nullptr;
+}
+
 using namespace GC;
+
+/*static*/ void GarbageCollector::Set(GarbageCollector* gc)
+{
+	theGC = gc;
+}
+
+/*static*/ GarbageCollector* GarbageCollector::Get()
+{
+	return theGC;
+}
 
 GarbageCollector::GarbageCollector()
 {

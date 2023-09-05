@@ -11,8 +11,10 @@ namespace GC
 		friend class Reference;
 
 	public:
-		Collectable(GarbageCollector* gc);
+		Collectable();
 		virtual ~Collectable();
+
+		virtual Type GetType() const override;
 
 	private:
 		int refCount;

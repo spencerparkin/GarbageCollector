@@ -7,9 +7,9 @@ namespace GC
 	class ReferenceBase : public Object
 	{
 	public:
-		ReferenceBase(GarbageCollector* gc, bool critical) : Object(gc)
+		ReferenceBase(bool isCritical)
 		{
-			this->critical = critical;
+			this->isCritical = isCritical;
 		}
 
 		virtual ~ReferenceBase()
@@ -23,11 +23,11 @@ namespace GC
 
 		bool IsCritical() const
 		{
-			return this->critical;
+			return this->isCritical;
 		}
 
 	private:
-		bool critical;
+		bool isCritical;
 	};
 
 	// The memory for instances of this class is managed by the application and typically allocated on the stack or owned by a collectable.
@@ -38,27 +38,32 @@ namespace GC
 	class Reference : public ReferenceBase
 	{
 	public:
-		Reference(GarbageCollector* gc) : ReferenceBase(gc, critical)
+		Reference() : ReferenceBase(critical)
 		{
 			this->collectable = nullptr;
 		}
 
-		Reference(GarbageCollector* gc, CollectableDerivative* collectable) : ReferenceBase(gc, critical)
+		Reference(CollectableDerivative* collectable) : ReferenceBase(critical)
 		{
 			this->collectable = nullptr;
 			this->Set(collectable);
 		}
 
+		virtual ~Reference()
+		{
+			this->Set(nullptr);
+		}
+
 		void Set(CollectableDerivative* collectable)
 		{
 			if (this->collectable)
-				if (--this->collectable->refCount == 0)
+				if (--((Collectable*)this->collectable)->refCount == 0)
 					delete this->collectable;
 
 			this->collectable = collectable;
 
 			if (this->collectable)
-				this->collectable->refCount++;
+				((Collectable*)this->collectable)->refCount++;
 		}
 
 		CollectableDerivative* Get()
@@ -79,7 +84,7 @@ namespace GC
 
 		virtual Object* IterationNext(void* userData) override
 		{
-			return this->collectable;
+			return (Object*)this->collectable;
 		}
 
 		virtual void IterationEnd(void* userData) override

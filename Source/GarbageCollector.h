@@ -15,6 +15,9 @@ namespace GC
 		GarbageCollector();
 		virtual ~GarbageCollector();
 
+		static void Set(GarbageCollector* gc);
+		static GarbageCollector* Get();
+
 		// A single call to this should detect and free all collectables that can be collected.
 		// TODO: Maybe add a maximum running time argument?  If infinite is given, work as currently designed.
 		//       If a run-time cap is given, then maybe a random starting point is a good stratagy?
