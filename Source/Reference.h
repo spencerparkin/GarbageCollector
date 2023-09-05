@@ -21,6 +21,8 @@ namespace GC
 			return Type::REF;
 		}
 
+		virtual void RawClear() = 0;
+
 		bool IsCritical() const
 		{
 			return this->isCritical;
@@ -52,6 +54,11 @@ namespace GC
 		virtual ~Reference()
 		{
 			this->Set(nullptr);
+		}
+
+		virtual void RawClear() override
+		{
+			this->collectable = nullptr;
 		}
 
 		void Set(CollectableDerivative* collectable)

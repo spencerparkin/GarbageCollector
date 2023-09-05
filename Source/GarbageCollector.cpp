@@ -47,11 +47,27 @@ void GarbageCollector::Collect()
 		assert(group.size() > 0);
 
 		for (Object* groupMember : group)
-		{
 			queue.erase(groupMember);
 
-			if (canCollect && groupMember->GetType() == Object::Type::COLLECTABLE && this->objectSet->find(groupMember) != this->objectSet->end())
-				delete groupMember;
+		if (canCollect)
+		{
+			for (Object* groupMember : group)
+			{
+				if (groupMember->GetType() == Object::Type::REF)
+				{
+					ReferenceBase* ref = (ReferenceBase*)groupMember;
+					ref->RawClear();
+				}
+			}
+
+			for (Object* groupMember : group)
+			{
+				if (groupMember->GetType() == Object::Type::COLLECTABLE)
+				{
+					Collectable* collectable = (Collectable*)groupMember;
+					delete collectable;
+				}
+			}
 		}
 	}
 }
