@@ -50,7 +50,7 @@ void GarbageCollector::Collect()
 		{
 			queue.erase(groupMember);
 
-			if (canCollect && groupMember->GetType() == Object::Type::COLLECTABLE)
+			if (canCollect && groupMember->GetType() == Object::Type::COLLECTABLE && this->objectSet->find(groupMember) != this->objectSet->end())
 				delete groupMember;
 		}
 	}
