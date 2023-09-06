@@ -90,6 +90,9 @@ bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group)
 	//       and collectables "point-to"/own references, but we have to be able to follow the
 	//       graph in the opposite direction.  E.g., a collectable is referenced by what references?
 	//       Also, a reference is owned by what collectable?  Ugh.  Fixing this might be hard.
+	//       Okay, I don't think we need to add any more data to the data-structure.  We have all
+	//       the information we need.  What we can do is build a undirected graph of all GC objects
+	//       before we process them!
 	ObjectSet queue;
 	queue.insert(initialObject);
 
