@@ -85,6 +85,11 @@ bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group)
 {
 	bool canCollect = true;
 
+	// TODO: Oops!  I think that we have to be able to follow parent pointers here, and
+	//       there aren't even any parent pointers to follow!  References point to collectables,
+	//       and collectables "point-to"/own references, but we have to be able to follow the
+	//       graph in the opposite direction.  E.g., a collectable is referenced by what references?
+	//       Also, a reference is owned by what collectable?  Ugh.  Fixing this might be hard.
 	ObjectSet queue;
 	queue.insert(initialObject);
 
