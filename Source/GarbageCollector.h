@@ -2,6 +2,8 @@
 
 #include "Defines.h"
 #include <set>
+#include <map>
+#include <vector>
 
 namespace GC
 {
@@ -29,8 +31,13 @@ namespace GC
 		void Unregister(Object* object);
 
 		typedef std::set<Object*> ObjectSet;
+		typedef std::map<Object*, std::vector<Object*>*> GraphMap;
 
-		bool FindGroup(Object* initialObject, ObjectSet& group);
+		void CreateGraph(GraphMap& graphMap);
+		void DestroyGraph(GraphMap& graphMap);
+		void CreateEdge(GraphMap& graphMap, Object* objectA, Object* objectB);
+
+		bool FindGroup(Object* initialObject, ObjectSet& group, GraphMap& graphMap);
 		
 		ObjectSet* objectSet;
 		int visitationKey;

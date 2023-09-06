@@ -34,8 +34,56 @@ GarbageCollector::GarbageCollector()
 	delete this->objectSet;
 }
 
+void GarbageCollector::CreateGraph(GraphMap& graphMap)
+{
+	for (Object* objectA : *this->objectSet)
+	{
+		void* userData = nullptr;
+		if (objectA->IterationBegin(userData))
+		{
+			while (true)
+			{
+				Object* objectB = objectA->IterationNext(userData);
+				if (!objectB)
+					break;
+
+				this->CreateEdge(graphMap, objectA, objectB);
+				this->CreateEdge(graphMap, objectB, objectA);
+			}
+
+			objectA->IterationEnd(userData);
+		}
+	}
+}
+
+void GarbageCollector::CreateEdge(GraphMap& graphMap, Object* objectA, Object* objectB)
+{
+	std::vector<Object*>* adjacentObjectArray = nullptr;
+	GraphMap::iterator iter = graphMap.find(objectA);
+	if (iter != graphMap.end())
+		adjacentObjectArray = iter->second;
+	else
+	{
+		adjacentObjectArray = new std::vector<Object*>();
+		graphMap.insert(std::pair<Object*, std::vector<Object*>*>(objectA, adjacentObjectArray));
+	}
+
+	adjacentObjectArray->push_back(objectB);
+}
+
+void GarbageCollector::DestroyGraph(GraphMap& graphMap)
+{
+	for (std::pair<Object*, std::vector<Object*>*> pair : graphMap)
+		delete pair.second;
+
+	graphMap.clear();
+}
+
 void GarbageCollector::Collect()
 {
+	GraphMap graphMap;
+	this->CreateGraph(graphMap);
+
 	ObjectSet queue;
 	for (Object* object : *this->objectSet)
 		queue.insert(object);
@@ -47,7 +95,7 @@ void GarbageCollector::Collect()
 		Object* object = *queue.begin();
 
 		ObjectSet group;
-		bool canCollect = this->FindGroup(object, group);
+		bool canCollect = this->FindGroup(object, group, graphMap);
 		assert(group.size() > 0);
 
 		for (Object* groupMember : group)
@@ -79,52 +127,36 @@ void GarbageCollector::Collect()
 				delete collectable;
 		}
 	}
+
+	this->DestroyGraph(graphMap);
 }
 
-bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group)
+bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group, GraphMap& graphMap)
 {
 	bool canCollect = true;
 
-	// TODO: Oops!  I think that we have to be able to follow parent pointers here, and
-	//       there aren't even any parent pointers to follow!  References point to collectables,
-	//       and collectables "point-to"/own references, but we have to be able to follow the
-	//       graph in the opposite direction.  E.g., a collectable is referenced by what references?
-	//       Also, a reference is owned by what collectable?  Ugh.  Fixing this might be hard.
-	//       Okay, I don't think we need to add any more data to the data-structure.  We have all
-	//       the information we need.  What we can do is build a undirected graph of all GC objects
-	//       before we process them!
 	ObjectSet queue;
 	queue.insert(initialObject);
 
 	while (queue.size() > 0)
 	{
-		Object* parentObject = *queue.begin();
-		queue.erase(parentObject);
-		group.insert(parentObject);
-		parentObject->visitationKey = this->visitationKey;
+		Object* object = *queue.begin();
+		queue.erase(object);
+		group.insert(object);
+		object->visitationKey = this->visitationKey;
 
-		if (parentObject->GetType() == Object::Type::REF)
+		if (object->GetType() == Object::Type::REF)
 		{
-			ReferenceBase* ref = (ReferenceBase*)parentObject;
+			ReferenceBase* ref = (ReferenceBase*)object;
 			if (ref->IsCritical())
 				canCollect = false;
 		}
 
-		void* userData = nullptr;
-		if (parentObject->IterationBegin(userData))
-		{
-			while (true)
-			{
-				Object* childObject = parentObject->IterationNext(userData);
-				if (!childObject)
-					break;
-
-				if (childObject->visitationKey != this->visitationKey)
-					queue.insert(childObject);
-			}
-
-			parentObject->IterationEnd(userData);
-		}
+		GraphMap::iterator iter = graphMap.find(object);
+		if (iter != graphMap.end())
+			for (Object* adjacentObject : *iter->second)
+				if (adjacentObject->visitationKey != this->visitationKey && queue.find(adjacentObject) == queue.end())
+					queue.insert(adjacentObject);
 	}
 
 	return canCollect;
