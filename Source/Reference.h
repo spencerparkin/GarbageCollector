@@ -4,7 +4,7 @@
 
 namespace GC
 {
-	class ReferenceBase : public Object
+	class GC_API ReferenceBase : public Object
 	{
 	public:
 		ReferenceBase(bool isCritical)
@@ -37,7 +37,7 @@ namespace GC
 	// are collected by the GC.  Most deallocations are expected to happen here, however, when reference counts go to zero.  When a cycle is
 	// created in the reference graph, however, then there may become a need for the GC to detect whether a collectable can be freed.
 	template<typename CollectableDerivative, bool critical>
-	class Reference : public ReferenceBase
+	class GC_API Reference : public ReferenceBase
 	{
 	public:
 		Reference() : ReferenceBase(critical)

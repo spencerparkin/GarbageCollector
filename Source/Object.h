@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Defines.h"
+#include <vector>
 
 namespace GC
 {
@@ -18,6 +19,12 @@ namespace GC
 		{
 			REF,
 			COLLECTABLE
+		};
+
+		struct TypicalIterationData
+		{
+			std::vector<GC::Object*> objectArray;
+			int i;
 		};
 
 		virtual Type GetType() const = 0;

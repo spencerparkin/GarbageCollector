@@ -15,6 +15,11 @@ namespace GC
 		virtual ~Collectable();
 
 		virtual Type GetType() const override;
+		virtual bool IterationBegin(void*& userData) override;
+		virtual Object* IterationNext(void* userData) override;
+		virtual void IterationEnd(void* userData) override;
+
+		virtual void PopulateIterationArray(std::vector<Object*>& iterationArray);
 
 	private:
 		int refCount;
