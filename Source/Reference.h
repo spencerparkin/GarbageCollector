@@ -85,17 +85,29 @@ namespace GC
 
 		virtual bool IterationBegin(void*& userData) override
 		{
-			userData = nullptr;
-			return this->collectable != nullptr;
+			if (!this->collectable)
+				return false;
+
+			bool* iterated = new bool;
+			*iterated = false;
+			userData = iterated;
+			return true;
 		}
 
 		virtual Object* IterationNext(void* userData) override
 		{
+			bool* iterated = (bool*)userData;
+			if (*iterated)
+				return nullptr;
+
+			*iterated = true;
 			return (Object*)this->collectable;
 		}
 
 		virtual void IterationEnd(void* userData) override
 		{
+			bool* iterated = (bool*)userData;
+			delete iterated;
 		}
 
 	private:

@@ -8,6 +8,8 @@ namespace GC
 
 	class GC_API Object
 	{
+		friend GarbageCollector;
+
 	public:
 		Object();
 		virtual ~Object();
@@ -22,5 +24,8 @@ namespace GC
 		virtual bool IterationBegin(void*& userData) = 0;
 		virtual Object* IterationNext(void* userData) = 0;
 		virtual void IterationEnd(void* userData) = 0;
+
+	private:
+		int visitationKey;
 	};
 }

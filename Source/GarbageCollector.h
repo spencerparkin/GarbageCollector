@@ -33,5 +33,6 @@ namespace GC
 		bool FindGroup(Object* initialObject, ObjectSet& group);
 		
 		ObjectSet* objectSet;
+		int visitationKey;
 	};
 }

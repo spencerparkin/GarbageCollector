@@ -1,6 +1,7 @@
 #include "GarbageCollector.h"
 #include "Object.h"
 #include "Reference.h"
+#include <vector>
 #include <assert.h>
 
 namespace GC
@@ -22,6 +23,7 @@ using namespace GC;
 
 GarbageCollector::GarbageCollector()
 {
+	this->visitationKey = 0;
 	this->objectSet = new ObjectSet();
 }
 
@@ -38,6 +40,8 @@ void GarbageCollector::Collect()
 	for (Object* object : *this->objectSet)
 		queue.insert(object);
 
+	this->visitationKey++;
+
 	while (queue.size() > 0)
 	{
 		Object* object = *queue.begin();
@@ -51,23 +55,28 @@ void GarbageCollector::Collect()
 
 		if (canCollect)
 		{
-			for (Object* groupMember : group)
-			{
-				if (groupMember->GetType() == Object::Type::REF)
-				{
-					ReferenceBase* ref = (ReferenceBase*)groupMember;
-					ref->RawClear();
-				}
-			}
+			std::vector<Collectable*> doomedCollectableArray;
 
 			for (Object* groupMember : group)
 			{
-				if (groupMember->GetType() == Object::Type::COLLECTABLE)
+				switch (groupMember->GetType())
 				{
-					Collectable* collectable = (Collectable*)groupMember;
-					delete collectable;
+					case Object::Type::REF:
+					{
+						ReferenceBase* ref = (ReferenceBase*)groupMember;
+						ref->RawClear();
+						break;
+					}
+					case Object::Type::COLLECTABLE:
+					{
+						doomedCollectableArray.push_back((Collectable*)groupMember);
+						break;
+					}
 				}
 			}
+
+			for (Collectable* collectable : doomedCollectableArray)
+				delete collectable;
 		}
 	}
 }
@@ -83,6 +92,8 @@ bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group)
 	{
 		Object* parentObject = *queue.begin();
 		queue.erase(parentObject);
+		group.insert(parentObject);
+		parentObject->visitationKey = this->visitationKey;
 
 		if (parentObject->GetType() == Object::Type::REF)
 		{
@@ -100,7 +111,8 @@ bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group)
 				if (!childObject)
 					break;
 
-				queue.insert(childObject);
+				if (childObject->visitationKey != this->visitationKey)
+					queue.insert(childObject);
 			}
 
 			parentObject->IterationEnd(userData);

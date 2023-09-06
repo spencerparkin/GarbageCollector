@@ -55,16 +55,26 @@ Blob::Blob()
 
 /*virtual*/ bool Blob::IterationBegin(void*& userData)
 {
-	return false;
+	bool* iterated = new bool;
+	*iterated = false;
+	userData = iterated;
+	return true;
 }
 
 /*virtual*/ GC::Object* Blob::IterationNext(void* userData)
 {
-	return nullptr;
+	bool* iterated = (bool*)userData;
+	if (*iterated)
+		return nullptr;
+
+	*iterated = true;
+	return &this->ref;
 }
 
 /*virtual*/ void Blob::IterationEnd(void* userData)
 {
+	bool* iterated = (bool*)userData;
+	delete iterated;
 }
 
 //---------------------------------- Blorp ----------------------------------
@@ -79,13 +89,24 @@ Blorp::Blorp()
 
 /*virtual*/ bool Blorp::IterationBegin(void*& userData)
 {
-	return false;
+	bool* iterated = new bool;
+	*iterated = false;
+	userData = iterated;
+	return true;
 }
+
 /*virtual*/ GC::Object* Blorp::IterationNext(void* userData)
 {
-	return nullptr;
+	bool* iterated = (bool*)userData;
+	if (*iterated)
+		return nullptr;
+
+	*iterated = true;
+	return &this->ref;
 }
 
 /*virtual*/ void Blorp::IterationEnd(void* userData)
 {
+	bool* iterated = (bool*)userData;
+	delete iterated;
 }

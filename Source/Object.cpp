@@ -5,6 +5,8 @@ using namespace GC;
 
 Object::Object()
 {
+	this->visitationKey = 0;
+
 	GarbageCollector::Get()->Register(this);
 }
 
