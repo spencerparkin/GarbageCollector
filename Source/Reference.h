@@ -51,9 +51,25 @@ namespace GC
 			this->Set(collectable);
 		}
 
+		Reference(const Reference<CollectableDerivative, critical>& ref) : ReferenceBase(critical)
+		{
+			this->collectable = nullptr;
+			this->Set(const_cast<CollectableDerivative*>(ref.Get()));
+		}
+
 		virtual ~Reference()
 		{
 			this->Set(nullptr);
+		}
+
+		void operator=(CollectableDerivative* collectable)
+		{
+			this->Set(collectable);
+		}
+
+		void operator=(const Reference<CollectableDerivative, critical>& ref)
+		{
+			this->Set(const_cast<CollectableDerivative*>(ref.Get()));
 		}
 
 		virtual void RawClear() override
