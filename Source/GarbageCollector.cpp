@@ -29,6 +29,9 @@ GarbageCollector::GarbageCollector()
 
 /*virtual*/ GarbageCollector::~GarbageCollector()
 {
+	// TODO: I'm asserting here, but I think it's because an exception is thrown, which causes a critical reference
+	//       to never destruct even though the VM is getting deleted.  Before we can really debug the GC, we need to
+	//       remove all exception throwing in the VM.
 	this->Collect();
 	assert(this->objectSet->size() == 0);
 	delete this->objectSet;
