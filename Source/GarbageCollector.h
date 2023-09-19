@@ -25,6 +25,8 @@ namespace GC
 		//       If a run-time cap is given, then maybe a random starting point is a good stratagy?
 		void Collect();
 
+		unsigned int NumTrackedObjects() { return this->objectSet->size(); }
+
 	private:
 		
 		void Register(Object* object);
