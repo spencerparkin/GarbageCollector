@@ -164,6 +164,7 @@ bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group, GraphM
 
 void GarbageCollector::Register(Object* object)
 {
+	// TODO: Can we make this an O(1) operation, even if it means slowing down collection time?
 	assert(this->objectSet->find(object) == this->objectSet->end());
 	this->objectSet->insert(object);
 }
