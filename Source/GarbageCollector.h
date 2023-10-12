@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Defines.h"
+#include "LinkedList.h"
 #include <set>
 #include <map>
 #include <vector>
@@ -25,7 +26,7 @@ namespace GC
 		//       If a run-time cap is given, then maybe a random starting point is a good stratagy?
 		void Collect();
 
-		unsigned int NumTrackedObjects() { return this->objectSet->size(); }
+		unsigned int NumTrackedObjects() { return this->objectList.GetCount(); }
 
 	private:
 		
@@ -41,7 +42,8 @@ namespace GC
 
 		bool FindGroup(Object* initialObject, ObjectSet& group, GraphMap& graphMap);
 		
-		ObjectSet* objectSet;
 		int visitationKey;
+
+		LinkedList<Object> objectList;
 	};
 }

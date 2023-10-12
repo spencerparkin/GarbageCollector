@@ -22,6 +22,7 @@
     <ClInclude Include="Source\Collectable.h" />
     <ClInclude Include="Source\Defines.h" />
     <ClInclude Include="Source\GarbageCollector.h" />
+    <ClInclude Include="Source\LinkedList.h" />
     <ClInclude Include="Source\Object.h" />
     <ClInclude Include="Source\Reference.h" />
   </ItemGroup>

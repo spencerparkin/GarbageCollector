@@ -24,19 +24,18 @@ using namespace GC;
 GarbageCollector::GarbageCollector()
 {
 	this->visitationKey = 0;
-	this->objectSet = new ObjectSet();
 }
 
 /*virtual*/ GarbageCollector::~GarbageCollector()
 {
 	this->Collect();
-	assert(this->objectSet->size() == 0);
-	delete this->objectSet;
+
+	assert(this->NumTrackedObjects() == 0);
 }
 
 void GarbageCollector::CreateGraph(GraphMap& graphMap)
 {
-	for (Object* objectA : *this->objectSet)
+	for (Object* objectA = this->objectList.GetHead(); objectA; objectA = objectA->next)
 	{
 		void* userData = nullptr;
 		if (objectA->IterationBegin(userData))
@@ -85,7 +84,7 @@ void GarbageCollector::Collect()
 	this->CreateGraph(graphMap);
 
 	ObjectSet queue;
-	for (Object* object : *this->objectSet)
+	for (Object* object = this->objectList.GetHead(); object; object = object->next)
 		queue.insert(object);
 
 	this->visitationKey++;
@@ -164,13 +163,12 @@ bool GarbageCollector::FindGroup(Object* initialObject, ObjectSet& group, GraphM
 
 void GarbageCollector::Register(Object* object)
 {
-	// TODO: Can we make this an O(1) operation, even if it means slowing down collection time?
-	assert(this->objectSet->find(object) == this->objectSet->end());
-	this->objectSet->insert(object);
+	// We can't afford to do more than an O(1) operation here.
+	this->objectList.InsertAfterTail(object);
 }
 
 void GarbageCollector::Unregister(Object* object)
 {
-	assert(this->objectSet->find(object) != this->objectSet->end());
-	this->objectSet->erase(object);
+	// We can't afford to do more than an O(1) operation here.
+	this->objectList.Remove(object);
 }

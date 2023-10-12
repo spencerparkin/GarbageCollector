@@ -32,7 +32,11 @@ namespace GC
 		virtual Object* IterationNext(void* userData) = 0;
 		virtual void IterationEnd(void* userData) = 0;
 
+		Object* next;
+		Object* prev;
+
 	private:
+
 		int visitationKey;
 	};
 }

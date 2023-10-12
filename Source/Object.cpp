@@ -7,6 +7,9 @@ Object::Object()
 {
 	this->visitationKey = 0;
 
+	this->next = nullptr;
+	this->prev = nullptr;
+
 	GarbageCollector::Get()->Register(this);
 }
 
