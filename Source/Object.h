@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Defines.h"
+#include "LinkedList.h"
 #include <vector>
 
 namespace GC
@@ -10,6 +11,7 @@ namespace GC
 	class GC_API Object
 	{
 		friend GarbageCollector;
+		friend LinkedList<Object>;
 
 	public:
 		Object();
@@ -32,10 +34,10 @@ namespace GC
 		virtual Object* IterationNext(void* userData) = 0;
 		virtual void IterationEnd(void* userData) = 0;
 
+	private:
+
 		Object* next;
 		Object* prev;
-
-	private:
 
 		int visitationKey;
 	};
