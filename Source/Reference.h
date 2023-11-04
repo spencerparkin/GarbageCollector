@@ -129,4 +129,10 @@ namespace GC
 	private:
 		CollectableDerivative* collectable;
 	};
+
+	template<typename CollectableDerivative>
+	using CriticalReference = Reference<CollectableDerivative, true>;
+
+	template<typename CollectableDerivative>
+	using NonCriticalReference = Reference<CollectableDerivative, false>;
 }
